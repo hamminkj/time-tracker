@@ -84,6 +84,11 @@
             font-weight: 300;
         }
 
+        .header-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
         .form-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -91,13 +96,23 @@
             margin-bottom: 1rem;
         }
 
-        input, select, textarea {
+        input, textarea {
             width: 100%;
             padding: 0.75rem;
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid var(--border-color);
             border-radius: 0.5rem;
             color: var(--text-primary);
+            transition: all 0.2s;
+        }
+
+        select {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            color: black;
             transition: all 0.2s;
         }
 
@@ -108,8 +123,7 @@
         }
 
         button {
-            width: 100%;
-            padding: 0.75rem;
+            padding: 0.75rem 1rem;
             border: 1px solid var(--border-color);
             border-radius: 0.5rem;
             background: linear-gradient(to right, 
@@ -125,6 +139,32 @@
         button:hover {
             opacity: 0.9;
             border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .submit-btn {
+            width: 100%;
+        }
+
+        .header-btn {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.5rem 1rem;
+        }
+
+        .reminder-toggle.active {
+            background: linear-gradient(to right, var(--accent-blue), var(--accent-pink));
+        }
+
+        .reminder-alert {
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .reminder-alert.show {
+            display: block;
         }
 
         .entry {
@@ -203,6 +243,18 @@
         <div class="card">
             <div class="card-header">
                 <h1 class="card-title">Time Tracker</h1>
+                <div class="header-buttons">
+                    <button id="reminder-toggle" class="header-btn">
+                        🔔 Reminders Off
+                    </button>
+                    <button id="download-csv" class="header-btn">
+                        📥 Download CSV
+                    </button>
+                </div>
+            </div>
+
+            <div id="reminder-alert" class="reminder-alert">
+                Time to log your activities for the past hour!
             </div>
 
             <form id="time-form">
@@ -213,21 +265,21 @@
                 
                 <input type="text" id="task" placeholder="Task" required class="mb-4">
                 
-               <select id="category" required class="mb-4">
-    <option value="">Select a category</option>
-    <option value="🛠️ Making">🛠️ Making</option>
-    <option value="👥 Meeting">👥 Meeting</option>
-    <option value="📋 Prep">📋 Prep</option>
-    <option value="📚 Teaching">📚 Teaching</option>
-    <option value="📎 Admin">📎 Admin</option>
-    <option value="🎯 Learning">🎯 Learning</option>
-    <option value="💼 Portfolio">💼 Portfolio</option>
-    <option value="✨ Other">✨ Other</option>
-</select>
+                <select id="category" required class="mb-4">
+                    <option value="">Select a category</option>
+                    <option value="🛠️ Making">🛠️ Making</option>
+                    <option value="👥 Meeting">👥 Meeting</option>
+                    <option value="📋 Prep">📋 Prep</option>
+                    <option value="📚 Teaching">📚 Teaching</option>
+                    <option value="📎 Admin">📎 Admin</option>
+                    <option value="🎯 Learning">🎯 Learning</option>
+                    <option value="💼 Portfolio">💼 Portfolio</option>
+                    <option value="✨ Other">✨ Other</option>
+                </select>
                 
                 <textarea id="notes" placeholder="Notes" rows="3" class="mb-4"></textarea>
                 
-                <button type="submit">Add Entry</button>
+                <button type="submit" class="submit-btn">Add Entry</button>
             </form>
         </div>
 
@@ -244,9 +296,60 @@
         // Get DOM elements
         const form = document.getElementById('time-form');
         const entriesContainer = document.getElementById('entries');
+        const reminderToggle = document.getElementById('reminder-toggle');
+        const reminderAlert = document.getElementById('reminder-alert');
+        const downloadButton = document.getElementById('download-csv');
 
         // Load entries from localStorage
         let entries = JSON.parse(localStorage.getItem('timeEntries')) || [];
+        let remindersEnabled = JSON.parse(localStorage.getItem('remindersEnabled')) || false;
+
+        // Initialize reminder toggle state
+        if (remindersEnabled) {
+            reminderToggle.textContent = '🔔 Reminders On';
+            reminderToggle.classList.add('active');
+        }
+
+        // Auto-fill current date and time
+        function updateDateTime() {
+            const now = new Date();
+            form.date.value = now.toISOString().split('T')[0];
+            form.time.value = now.toTimeString().slice(0,5);
+        }
+
+        // Update time every minute
+        updateDateTime();
+        setInterval(updateDateTime, 60000);
+
+        // Reminder system
+        let reminderInterval;
+        function setupReminders() {
+            if (remindersEnabled) {
+                reminderInterval = setInterval(() => {
+                    const now = new Date();
+                    if (now.getMinutes() === 0) { // Check if it's the start of an hour
+                        reminderAlert.classList.add('show');
+                        setTimeout(() => {
+                            reminderAlert.classList.remove('show');
+                        }, 10000); // Hide after 10 seconds
+                    }
+                }, 60000); // Check every minute
+            } else {
+                clearInterval(reminderInterval);
+            }
+        }
+
+        // Toggle reminders
+        reminderToggle.addEventListener('click', () => {
+            remindersEnabled = !remindersEnabled;
+            localStorage.setItem('remindersEnabled', remindersEnabled);
+            reminderToggle.textContent = remindersEnabled ? '🔔 Reminders On' : '🔔 Reminders Off';
+            reminderToggle.classList.toggle('active', remindersEnabled);
+            setupReminders();
+        });
+
+        // Initialize reminders if enabled
+        setupReminders();
 
         // Render entries
         function renderEntries() {
@@ -283,7 +386,7 @@
             
             renderEntries();
             form.reset();
-            form.date.value = new Date().toISOString().split('T')[0];
+            updateDateTime(); // Reset date/time to current
         });
 
         // Delete entry
@@ -293,8 +396,23 @@
             renderEntries();
         }
 
-        // Set today's date as default
-        form.date.value = new Date().toISOString().split('T')[0];
+        // Download CSV
+        downloadButton.addEventListener('click', () => {
+            const headers = ['Date', 'Time', 'Task', 'Category', 'Notes'];
+            const csvContent = [
+                headers.join(','),
+                ...entries.map(entry => 
+                    [entry.date, entry.time, entry.task, entry.category, entry.notes].join(',')
+                )
+            ].join('\n');
+
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'time-tracking-data.csv';
+            a.click();
+        });
 
         // Initial render
         renderEntries();
