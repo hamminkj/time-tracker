@@ -4,180 +4,300 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Time Tracker</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .entry { transition: all 0.2s; }
-        .entry:hover { background-color: #f3f4f6; }
+        :root {
+            --bg-dark: #1a1a1a;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --accent-blue: rgba(59, 130, 246, 0.2);
+            --accent-pink: rgba(236, 72, 153, 0.2);
+            --accent-yellow: rgba(234, 179, 8, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(to bottom right, var(--bg-dark), #000);
+            color: var(--text-primary);
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Decorative circle */
+        .circle-decoration {
+            width: 128px;
+            height: 128px;
+            margin: 0 auto 2rem;
+            position: relative;
+        }
+
+        .circle-outer {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+        }
+
+        .circle-inner {
+            position: absolute;
+            inset: 1rem;
+            border-radius: 50%;
+            background: linear-gradient(45deg, 
+                var(--accent-blue),
+                var(--accent-pink),
+                var(--accent-yellow)
+            );
+            opacity: 0.5;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            backdrop-filter: blur(12px);
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 300;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            color: var(--text-primary);
+            transition: all 0.2s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: rgba(59, 130, 246, 0.5);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
+        }
+
+        button {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            background: linear-gradient(to right, 
+                var(--accent-blue),
+                var(--accent-pink),
+                var(--accent-yellow)
+            );
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            opacity: 0.9;
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .entry {
+            padding: 1rem;
+            border-radius: 0.5rem;
+            background: linear-gradient(to right,
+                rgba(59, 130, 246, 0.05),
+                rgba(236, 72, 153, 0.05),
+                rgba(234, 179, 8, 0.05)
+            );
+            border: 1px solid var(--border-color);
+            margin-bottom: 0.75rem;
+            transition: all 0.2s;
+        }
+
+        .entry:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .entry-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .entry-title {
+            font-weight: 500;
+        }
+
+        .entry-time {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .entry-category {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .entry-notes {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            padding: 0.25rem 0.5rem;
+            opacity: 0;
+            width: auto;
+        }
+
+        .entry:hover .delete-btn {
+            opacity: 1;
+        }
+
+        @media (max-width: 640px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen">
-    <div class="max-w-4xl mx-auto p-4">
-        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-            <div class="flex justify-between items-center mb-4">
-                <h1 class="text-2xl font-bold">Time Tracker</h1>
-                <button onclick="downloadCSV()" 
-                        class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
-                    Download CSV
-                </button>
+<body>
+    <div class="container">
+        <!-- Decorative circle -->
+        <div class="circle-decoration">
+            <div class="circle-outer"></div>
+            <div class="circle-inner"></div>
+        </div>
+
+        <!-- Input form card -->
+        <div class="card">
+            <div class="card-header">
+                <h1 class="card-title">Time Tracker</h1>
             </div>
-            
-            <form id="timeForm" class="space-y-4">
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Date</label>
-                        <input type="date" id="date" required class="w-full p-2 border rounded">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Time</label>
-                        <select id="time" required class="w-full p-2 border rounded"></select>
-                    </div>
-                </div>
 
-                <div>
-                    <label class="block text-sm font-medium mb-1">Task</label>
-                    <input type="text" id="task" required placeholder="What are you working on?" 
-                           class="w-full p-2 border rounded">
+            <form id="time-form">
+                <div class="form-grid">
+                    <input type="date" id="date" required>
+                    <input type="time" id="time" required>
                 </div>
-
-                <div>
-                    <label class="block text-sm font-medium mb-1">Category</label>
-                    <select id="category" required class="w-full p-2 border rounded">
-                        <option value="">Select a category</option>
-                        <option value="Making">🛠️ Making</option>
-                        <option value="Meeting">👥 Meeting</option>
-                        <option value="Prep">📋 Prep</option>
-                        <option value="Teaching">📚 Teaching</option>
-                        <option value="Admin">📎 Admin</option>
-                        <option value="Learning">🎯 Learning</option>
-                        <option value="Portfolio">💼 Portfolio</option>
-                        <option value="Other">✨ Other</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium mb-1">Notes</label>
-                    <textarea id="notes" rows="2" placeholder="Additional details..." 
-                              class="w-full p-2 border rounded"></textarea>
-                </div>
-
-                <button type="submit" 
-                        class="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
-                    Add Entry
-                </button>
+                
+                <input type="text" id="task" placeholder="Task" required class="mb-4">
+                
+                <select id="category" required class="mb-4">
+                    <option value="">Select a category</option>
+                    <option value="🌅 Morning">🌅 Morning</option>
+                    <option value="☀️ Afternoon">☀️ Afternoon</option>
+                    <option value="🌙 Evening">🌙 Evening</option>
+                    <option value="💫 Focus">💫 Focus</option>
+                    <option value="🌊 Flow">🌊 Flow</option>
+                    <option value="✨ Creative">✨ Creative</option>
+                    <option value="🎯 Goal">🎯 Goal</option>
+                    <option value="💭 Plan">💭 Plan</option>
+                </select>
+                
+                <textarea id="notes" placeholder="Notes" rows="3" class="mb-4"></textarea>
+                
+                <button type="submit">Add Entry</button>
             </form>
         </div>
 
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <h2 class="text-xl font-bold mb-4">Recent Entries</h2>
-            <div id="entries" class="space-y-2"></div>
+        <!-- Entries list card -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Recent Entries</h2>
+            </div>
+            <div id="entries"></div>
         </div>
     </div>
 
     <script>
-        // Initialize time options
-        const timeSelect = document.getElementById('time');
-        for (let i = 0; i < 24; i++) {
-            const option = document.createElement('option');
-            option.value = i;
-            option.textContent = `${i.toString().padStart(2, '0')}:00`;
-            timeSelect.appendChild(option);
+        // Get DOM elements
+        const form = document.getElementById('time-form');
+        const entriesContainer = document.getElementById('entries');
+
+        // Load entries from localStorage
+        let entries = JSON.parse(localStorage.getItem('timeEntries')) || [];
+
+        // Render entries
+        function renderEntries() {
+            entriesContainer.innerHTML = entries.map(entry => `
+                <div class="entry" data-id="${entry.id}">
+                    <div class="entry-header">
+                        <div class="entry-title">${entry.task}</div>
+                        <div class="entry-meta">
+                            <span class="entry-time">${entry.date} at ${entry.time}</span>
+                            <button class="delete-btn" onclick="deleteEntry(${entry.id})">×</button>
+                        </div>
+                    </div>
+                    <div class="entry-category">${entry.category}</div>
+                    ${entry.notes ? `<div class="entry-notes">${entry.notes}</div>` : ''}
+                </div>
+            `).join('');
         }
 
-        // Set current date and time
-        const now = new Date();
-        document.getElementById('date').value = now.toISOString().split('T')[0];
-        document.getElementById('time').value = now.getHours();
-
-        // Load saved entries
-        let entries = JSON.parse(localStorage.getItem('timeEntries') || '[]');
-        updateEntriesDisplay();
-
-        // Handle form submission
-        document.getElementById('timeForm').addEventListener('submit', function(e) {
+        // Add new entry
+        form.addEventListener('submit', (e) => {
             e.preventDefault();
             
             const newEntry = {
                 id: Date.now(),
-                date: document.getElementById('date').value,
-                time: document.getElementById('time').value,
-                task: document.getElementById('task').value,
-                category: document.getElementById('category').value,
-                notes: document.getElementById('notes').value
+                date: form.date.value,
+                time: form.time.value,
+                task: form.task.value,
+                category: form.category.value,
+                notes: form.notes.value
             };
 
             entries.unshift(newEntry);
             localStorage.setItem('timeEntries', JSON.stringify(entries));
             
-            // Reset form
-            document.getElementById('task').value = '';
-            document.getElementById('category').value = '';
-            document.getElementById('notes').value = '';
-            
-            updateEntriesDisplay();
+            renderEntries();
+            form.reset();
+            form.date.value = new Date().toISOString().split('T')[0];
         });
 
-        function updateEntriesDisplay() {
-            const entriesDiv = document.getElementById('entries');
-            entriesDiv.innerHTML = entries.map(entry => `
-                <div class="entry p-3 border rounded">
-                    <div class="flex justify-between text-sm text-gray-600">
-                        <span>${entry.date} at ${entry.time}:00</span>
-                        <span class="font-medium">${entry.category}</span>
-                    </div>
-                    <div class="mt-1 font-medium">${entry.task}</div>
-                    ${entry.notes ? `<div class="mt-1 text-sm text-gray-600">${entry.notes}</div>` : ''}
-                    <div class="mt-2">
-                        <button onclick="deleteEntry(${entry.id})" 
-                                class="text-red-500 text-sm hover:text-red-700">
-                            Delete
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
+        // Delete entry
         function deleteEntry(id) {
-            if (confirm('Are you sure you want to delete this entry?')) {
-                entries = entries.filter(entry => entry.id !== id);
-                localStorage.setItem('timeEntries', JSON.stringify(entries));
-                updateEntriesDisplay();
-            }
+            entries = entries.filter(entry => entry.id !== id);
+            localStorage.setItem('timeEntries', JSON.stringify(entries));
+            renderEntries();
         }
 
-        function downloadCSV() {
-            // Define CSV headers
-            const headers = ['Date', 'Time', 'Category', 'Task', 'Notes'];
-            
-            // Convert entries to CSV format
-            const csvData = entries.map(entry => [
-                entry.date,
-                `${entry.time}:00`,
-                entry.category,
-                entry.task,
-                entry.notes
-            ]);
-            
-            // Add headers to beginning of data
-            csvData.unshift(headers);
-            
-            // Convert to CSV string
-            const csvString = csvData.map(row => 
-                row.map(cell => 
-                    // Handle cells that contain commas by wrapping in quotes
-                    cell ? `"${cell.replace(/"/g, '""')}"` : '""'
-                ).join(',')
-            ).join('\n');
-            
-            // Create download link
-            const downloadLink = document.createElement('a');
-            downloadLink.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvString);
-            downloadLink.download = `time-tracker-export-${new Date().toISOString().split('T')[0]}.csv`;
-            
-            // Trigger download
-            document.body.appendChild(downloadLink);
-            downloadLink.click();
-            document.body.removeChild(downloadLink);
-        }
+        // Set today's date as default
+        form.date.value = new Date().toISOString().split('T')[0];
+
+        // Initial render
+        renderEntries();
     </script>
 </body>
 </html>
