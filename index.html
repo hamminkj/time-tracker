@@ -1,408 +1,258 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Julie's SuperDuper Time Tracker</title>
-    <link rel="icon" type="image/svg+xml" href="favicon.svg">
-    <style>
-        :root {
-            --bg-dark: #1a1a1a;
-            --card-bg: rgba(255, 255, 255, 0.05);
-            --border-color: rgba(255, 255, 255, 0.1);
-            --text-primary: #ffffff;
-            --text-secondary: rgba(255, 255, 255, 0.7);
-            --accent-blue: rgba(59, 130, 246, 0.2);
-            --accent-pink: rgba(236, 72, 153, 0.2);
-            --accent-yellow: rgba(234, 179, 8, 0.2);
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Task App</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    :root {
+      --bg-dark: #1a1a1a;
+      --card-bg: rgba(255, 255, 255, 0.05);
+      --border-color: rgba(255, 255, 255, 0.1);
+      --text-primary: #ffffff;
+      --text-secondary: rgba(255, 255, 255, 0.7);
+      --accent-blue: rgba(59, 130, 246, 0.2);
+      --accent-pink: rgba(236, 72, 153, 0.2);
+      --accent-yellow: rgba(234, 179, 8, 0.2);
+    }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: system-ui, -apple-system, sans-serif;
-        }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
 
-        body {
-            min-height: 100vh;
-            background: linear-gradient(to bottom right, var(--bg-dark), #000);
-            color: var(--text-primary);
-            padding: 2rem 1rem;
-        }
+    body {
+      min-height: 100vh;
+      background: linear-gradient(to bottom right, var(--bg-dark), #000);
+      color: var(--text-primary);
+      padding: 2rem 1rem;
+    }
 
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
 
-        /* Decorative circle */
-       .circle-decoration {
-    width: 200px;
-    height: 200px;
-    margin: 0 auto 2rem;
-    position: relative;
-}
+    .decorative-image {
+      width: 150px;
+      height: 150px;
+      margin: 1rem auto;
+      display: block;
+    }
 
-.circle-decoration img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    border-radius: 50%;
-}
+    .task-list, .add-task-form {
+      max-width: 800px;
+      margin: 0 auto;
+    }
 
-        .card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 0.75rem;
-            padding: 1.5rem;
-            backdrop-filter: blur(12px);
-            margin-bottom: 1.5rem;
-        }
+    .task {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      backdrop-filter: blur(12px);
+      margin-bottom: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      transition: all 0.2s;
+    }
 
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
+    .task:hover {
+      border-color: rgba(255, 255, 255, 0.2);
+    }
 
-        .card-title {
-            font-size: 1.5rem;
-            font-weight: 300;
-        }
+    .task-header {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
 
-        .header-buttons {
-            display: flex;
-            gap: 0.5rem;
-        }
+    .task-icon {
+      width: 25px;
+      height: 25px;
+    }
 
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
+    .task-complete-btn {
+      background: linear-gradient(to right, var(--accent-blue), var(--accent-pink));
+      color: var(--text-primary);
+      padding: 0.75rem;
+      border: 1px solid var(--border-color);
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
 
-        input, textarea {
-            width: 100%;
-            padding: 0.75rem;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border-color);
-            border-radius: 0.5rem;
-            color: var(--text-primary);
-            transition: all 0.2s;
-        }
+    .task-complete-btn:hover {
+      opacity: 0.9;
+      border-color: rgba(255, 255, 255, 0.2);
+    }
 
-        select {
-            width: 100%;
-            padding: 0.75rem;
-            background: rgba(255, 255, 255, 0.9);
-            border: 1px solid var(--border-color);
-            border-radius: 0.5rem;
-            color: black;
-            transition: all 0.2s;
-        }
+    .add-task-form input, .add-task-form select, .add-task-form button {
+      margin-right: 5px;
+      padding: 10px;
+      border-radius: 0.5rem;
+      border: 1px solid var(--border-color);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-primary);
+      transition: all 0.2s;
+    }
 
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: rgba(59, 130, 246, 0.5);
-            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
-        }
+    .add-task-form input:focus, .add-task-form select:focus {
+      outline: none;
+      border-color: rgba(59, 130, 246, 0.5);
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
+    }
 
-        button {
-            padding: 0.75rem 1rem;
-            border: 1px solid var(--border-color);
-            border-radius: 0.5rem;
-            background: linear-gradient(to right, 
-                var(--accent-blue),
-                var(--accent-pink),
-                var(--accent-yellow)
-            );
-            color: var(--text-primary);
-            cursor: pointer;
-            transition: all 0.2s;
-        }
+    .add-task-form button {
+      background: linear-gradient(to right, var(--accent-blue), var(--accent-pink), var(--accent-yellow));
+      color: var(--text-primary);
+      cursor: pointer;
+      border: none;
+    }
 
-        button:hover {
-            opacity: 0.9;
-            border-color: rgba(255, 255, 255, 0.2);
-        }
+    .add-task-form button:hover {
+      opacity: 0.9;
+      border-color: rgba(255, 255, 255, 0.2);
+    }
 
-        .submit-btn {
-            width: 100%;
-        }
+    .task-list h2, .add-task-form h3 {
+      margin-bottom: 1rem;
+    }
 
-        .header-btn {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 0.5rem 1rem;
-        }
+    .export-btn {
+      margin-top: 1rem;
+      padding: 10px;
+      border-radius: 0.5rem;
+      border: 1px solid var(--border-color);
+      background: linear-gradient(to right, var(--accent-blue), var(--accent-pink), var(--accent-yellow));
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: all 0.2s;
+      width: 100%;
+    }
 
-        .reminder-toggle.active {
-            background: linear-gradient(to right, var(--accent-blue), var(--accent-pink));
-        }
-
-        .reminder-alert {
-            background: rgba(59, 130, 246, 0.2);
-            border: 1px solid rgba(59, 130, 246, 0.3);
-            padding: 1rem;
-            border-radius: 0.5rem;
-            margin-bottom: 1rem;
-            display: none;
-        }
-
-        .reminder-alert.show {
-            display: block;
-        }
-
-        .entry {
-            padding: 1rem;
-            border-radius: 0.5rem;
-            background: linear-gradient(to right,
-                rgba(59, 130, 246, 0.05),
-                rgba(236, 72, 153, 0.05),
-                rgba(234, 179, 8, 0.05)
-            );
-            border: 1px solid var(--border-color);
-            margin-bottom: 0.75rem;
-            transition: all 0.2s;
-        }
-
-        .entry:hover {
-            border-color: rgba(255, 255, 255, 0.2);
-        }
-
-        .entry-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.5rem;
-        }
-
-        .entry-title {
-            font-weight: 500;
-        }
-
-        .entry-time {
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-        }
-
-        .entry-category {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-            margin-bottom: 0.5rem;
-        }
-
-        .entry-notes {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-        }
-
-        .delete-btn {
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            padding: 0.25rem 0.5rem;
-            opacity: 0;
-            width: auto;
-        }
-
-        .entry:hover .delete-btn {
-            opacity: 1;
-        }
-
-        @media (max-width: 640px) {
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+    .export-btn:hover {
+      opacity: 0.9;
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Decorative circle -->
-        <div class="circle-decoration">
-    <img src="time-wheel.png" alt="Geometric time wheel artwork" />
-</div>
-
-        <!-- Input form card -->
-        <div class="card">
-            <div class="card-header">
-                <h1 class="card-title">Time is short and full, like an outgrown Frock</h1>
-                <div class="header-buttons">
-                    <button id="reminder-toggle" class="header-btn">
-                        🔔 Reminders Off
-                    </button>
-                    <button id="download-csv" class="header-btn">
-                        📥 Download CSV
-                    </button>
-                </div>
-            </div>
-
-            <div id="reminder-alert" class="reminder-alert">
-                Time to log your activities for the past hour!
-            </div>
-
-            <form id="time-form">
-                <div class="form-grid">
-                    <input type="date" id="date" required>
-                    <input type="time" id="time" required>
-                </div>
-                
-                <input type="text" id="task" placeholder="Task" required class="mb-4">
-                
-                <select id="category" required class="mb-4">
-                    <option value="">Select a category</option>
-                    <option value="🛠️ Making">🛠️ Making</option>
-                    <option value="👥 Meeting">👥 Meeting</option>
-                    <option value="📋 Prep">📋 Prep</option>
-                    <option value="📚 Teaching">📚 Teaching</option>
-                    <option value="📎 Admin">📎 Admin</option>
-                    <option value="🎯 Learning">🎯 Learning</option>
-                    <option value="💼 Portfolio">💼 Portfolio</option>
-                    <option value="✨ Other">✨ Other</option>
-                </select>
-                
-                <textarea id="notes" placeholder="Notes" rows="3" class="mb-4"></textarea>
-                
-                <button type="submit" class="submit-btn">Add Entry</button>
-            </form>
-        </div>
-
-        <!-- Entries list card -->
-        <div class="card">
-            <div class="card-header">
-                <h2 class="card-title">Recent Entries</h2>
-            </div>
-            <div id="entries"></div>
-        </div>
+  <div class="container">
+    <img src="icon1.png" alt="Decorative Spiral" class="decorative-image">
+    <div class="task-list">
+      <h2>Task List</h2>
+      <div id="tasks"></div>
+      <button class="export-btn" onclick="exportToCSV()">Export to CSV</button>
     </div>
 
-    <script>
-        // Get DOM elements
-        const form = document.getElementById('time-form');
-        const entriesContainer = document.getElementById('entries');
-        const reminderToggle = document.getElementById('reminder-toggle');
-        const reminderAlert = document.getElementById('reminder-alert');
-        const downloadButton = document.getElementById('download-csv');
+    <div class="add-task-form">
+      <h3>Add a New Task</h3>
+      <input type="text" id="taskText" placeholder="Enter task...">
+      <select id="taskPoints">
+        <option value="1">1 pt</option>
+        <option value="2">2 pts</option>
+        <option value="3">3 pts</option>
+        <option value="4">4 pts</option>
+        <option value="5">5 pts</option>
+      </select>
+      <select id="taskCategory">
+        <option value="admin">Admin</option>
+        <option value="portfolio">Portfolio</option>
+        <option value="prep">Prep</option>
+        <option value="teaching">Teaching</option>
+        <option value="making">Making</option>
+        <option value="learning">Learning</option>
+        <option value="other">Other</option>
+      </select>
+      <button onclick="addTask()">Add Task</button>
+    </div>
 
-        // Load entries from localStorage
-        let entries = JSON.parse(localStorage.getItem('timeEntries')) || [];
-        let remindersEnabled = JSON.parse(localStorage.getItem('remindersEnabled')) || false;
+    <img src="icon2.png" alt="Decorative Spiral" class="decorative-image">
+  </div>
 
-        // Initialize reminder toggle state
-        if (remindersEnabled) {
-            reminderToggle.textContent = '🔔 Reminders On';
-            reminderToggle.classList.add('active');
-        }
+  <script>
+    const tasks = [];
 
-        // Auto-fill current date and time
-        function updateDateTime() {
-            const now = new Date();
-            form.date.value = now.toISOString().split('T')[0];
-            form.time.value = now.toTimeString().slice(0,5);
-        }
+    function renderTasks() {
+      const tasksDiv = document.getElementById('tasks');
+      tasksDiv.innerHTML = '';
+      tasks.forEach(task => {
+        const taskDiv = document.createElement('div');
+        taskDiv.className = 'task';
+        taskDiv.innerHTML = `
+          <div class="task-header">
+            <span class="task-icon"><i class="fas fa-tasks"></i></span>
+            <div>
+              <div>${task.text}</div>
+              <small>Points: ${task.points}, Category: ${task.category}</small><br>
+              <small>Date Added: ${task.dateAdded}</small><br>
+              ${task.dateCompleted ? `<small>Date Completed: ${task.dateCompleted}</small>` : ''}
+            </div>
+          </div>
+          ${!task.completed ? `<button class="task-complete-btn" onclick="completeTask(${task.id})">Mark Complete</button>` : ''}
+        `;
+        tasksDiv.appendChild(taskDiv);
+      });
+    }
 
-        // Update time every minute
-        updateDateTime();
-        setInterval(updateDateTime, 60000);
+    function addTask() {
+      const taskText = document.getElementById('taskText').value;
+      const taskPoints = document.getElementById('taskPoints').value;
+      const taskCategory = document.getElementById('taskCategory').value;
+      const dateAdded = new Date().toLocaleDateString();
 
-        // Reminder system
-        let reminderInterval;
-        function setupReminders() {
-            if (remindersEnabled) {
-                reminderInterval = setInterval(() => {
-                    const now = new Date();
-                    if (now.getMinutes() === 0) { // Check if it's the start of an hour
-                        reminderAlert.classList.add('show');
-                        setTimeout(() => {
-                            reminderAlert.classList.remove('show');
-                        }, 10000); // Hide after 10 seconds
-                    }
-                }, 60000); // Check every minute
-            } else {
-                clearInterval(reminderInterval);
-            }
-        }
+      if (taskText.trim()) {
+        const newTask = {
+          id: Date.now(),
+          text: taskText,
+          points: taskPoints,
+          category: taskCategory,
+          dateAdded: dateAdded,
+          completed: false,
+          dateCompleted: null
+        };
+        tasks.push(newTask);
+        renderTasks();
+        document.getElementById('taskText').value = '';
+      }
+    }
 
-        // Toggle reminders
-        reminderToggle.addEventListener('click', () => {
-            remindersEnabled = !remindersEnabled;
-            localStorage.setItem('remindersEnabled', remindersEnabled);
-            reminderToggle.textContent = remindersEnabled ? '🔔 Reminders On' : '🔔 Reminders Off';
-            reminderToggle.classList.toggle('active', remindersEnabled);
-            setupReminders();
-        });
+    function completeTask(id) {
+      const taskIndex = tasks.findIndex(task => task.id === id);
+      if (taskIndex !== -1) {
+        tasks[taskIndex].completed = true;
+        tasks[taskIndex].dateCompleted = new Date().toLocaleDateString();
+        renderTasks();
+      }
+    }
 
-        // Initialize reminders if enabled
-        setupReminders();
+    function exportToCSV() {
+      const headers = ['Task', 'Points', 'Category', 'Date Added', 'Date Completed'];
+      const csvContent = [
+        headers.join(','),
+        ...tasks.map(task => [
+          `"${task.text}"`,
+          task.points,
+          task.category,
+          task.dateAdded,
+          task.dateCompleted ? task.dateCompleted : ''
+        ].join(','))
+      ].join('\n');
 
-        // Render entries
-        function renderEntries() {
-            entriesContainer.innerHTML = entries.map(entry => `
-                <div class="entry" data-id="${entry.id}">
-                    <div class="entry-header">
-                        <div class="entry-title">${entry.task}</div>
-                        <div class="entry-meta">
-                            <span class="entry-time">${entry.date} at ${entry.time}</span>
-                            <button class="delete-btn" onclick="deleteEntry(${entry.id})">×</button>
-                        </div>
-                    </div>
-                    <div class="entry-category">${entry.category}</div>
-                    ${entry.notes ? `<div class="entry-notes">${entry.notes}</div>` : ''}
-                </div>
-            `).join('');
-        }
-
-        // Add new entry
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            
-            const newEntry = {
-                id: Date.now(),
-                date: form.date.value,
-                time: form.time.value,
-                task: form.task.value,
-                category: form.category.value,
-                notes: form.notes.value
-            };
-
-            entries.unshift(newEntry);
-            localStorage.setItem('timeEntries', JSON.stringify(entries));
-            
-            renderEntries();
-            form.reset();
-            updateDateTime(); // Reset date/time to current
-        });
-
-        // Delete entry
-        function deleteEntry(id) {
-            entries = entries.filter(entry => entry.id !== id);
-            localStorage.setItem('timeEntries', JSON.stringify(entries));
-            renderEntries();
-        }
-
-        // Download CSV
-        downloadButton.addEventListener('click', () => {
-            const headers = ['Date', 'Time', 'Task', 'Category', 'Notes'];
-            const csvContent = [
-                headers.join(','),
-                ...entries.map(entry => 
-                    [entry.date, entry.time, entry.task, entry.category, entry.notes].join(',')
-                )
-            ].join('\n');
-
-            const blob = new Blob([csvContent], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'time-tracking-data.csv';
-            a.click();
-        });
-
-        // Initial render
-        renderEntries();
-    </script>
+      const blob = new Blob([csvContent], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `tasks-${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    }
+  </script>
 </body>
 </html>
